@@ -5,7 +5,7 @@ function App() {
 	return (
 		<>
 			<Stack>
-				<h1>React App</h1>
+				<h1>Test Deploy</h1>
 			</Stack>
 		</>
 	);
