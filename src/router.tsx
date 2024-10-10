@@ -18,6 +18,6 @@ export const router = createBrowserRouter(
 				<Route path='/' element={<App />} />
 			</Route>
 		</>
-	)
-	// { basename: '/restrai' }
+	),
+	{ basename: '/calcetto' }
 );
