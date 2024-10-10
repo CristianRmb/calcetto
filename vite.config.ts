@@ -42,5 +42,5 @@ export default defineConfig({
 			},
 		}),
 	],
-	base: '/calcetto',
+	base: '/calcetto/',
 });
