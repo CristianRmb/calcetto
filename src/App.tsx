@@ -1,12 +1,19 @@
-// @ts-nocheck
 import { Stack, Typography } from '@mui/material';
 import Box from './3dBox';
 import { Canvas } from '@react-three/fiber';
 import { get_ranking } from './api';
 import { useEffect, useState } from 'react';
 
+interface Team {
+	image_url: string;
+	name: string;
+	win_match: number;
+	total_match: number;
+	win_perc: number;
+}
+
 function App() {
-	const [classifica, setClassifica] = useState([]);
+	const [classifica, setClassifica] = useState<Team[]>([]);
 
 	useEffect(() => {
 		get_ranking().then((data) => {
