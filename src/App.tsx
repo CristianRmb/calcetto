@@ -17,9 +17,12 @@ function App() {
 
 	useEffect(() => {
 		get_ranking().then((data) => {
-			setClassifica(data);
+			if (data != null) {
+				setClassifica(data);
+			}
 		});
 	}, []);
+	console.log('Classifica: ', classifica);
 
 	return (
 		<Stack className='h-full'>

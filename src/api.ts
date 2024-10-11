@@ -7,7 +7,7 @@ const get_ranking = async () => {
 		);
 		return response.data;
 	} catch (error) {
-		return error;
+		return null;
 	}
 };
 
