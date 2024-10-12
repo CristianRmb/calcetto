@@ -4,7 +4,21 @@ import { Canvas } from '@react-three/fiber';
 import { get_ranking } from './api';
 import { useEffect, useState } from 'react';
 
+import alessandro from './assets/alessandro.webp';
+import francesco from './assets/francesco.jpg';
+import loris from './assets/loris.jpg';
+import achille from './assets/achille.jpg';
+import mattia from './assets/mattia.jpeg';
+import enrico from './assets/enrico.webp';
+import cristian from './assets/cristian.jpg';
+import laura from './assets/laura.png';
+import cristina from './assets/cristina.jpg';
+import stefano from './assets/stefano.jpeg';
+import claudio from './assets/claudio.jpeg';
+import marco from './assets/marco.jpeg';
+
 interface Team {
+	id: number;
 	image_url: string;
 	name: string;
 	win_match: number;
@@ -15,6 +29,21 @@ interface Team {
 function App() {
 	const [classifica, setClassifica] = useState<Team[]>([]);
 
+	const foto = [
+		{ id: 1, src: loris },
+		{ id: 2, src: francesco },
+		{ id: 3, src: alessandro },
+		{ id: 4, src: laura },
+		{ id: 5, src: achille },
+		{ id: 6, src: cristian },
+		{ id: 7, src: stefano },
+		{ id: 8, src: claudio },
+		{ id: 9, src: mattia },
+		{ id: 10, src: cristina },
+		{ id: 11, src: enrico },
+		{ id: 12, src: marco },
+	];
+
 	useEffect(() => {
 		get_ranking().then((data) => {
 			if (data != null) {
@@ -22,7 +51,6 @@ function App() {
 			}
 		});
 	}, []);
-	console.log('Classifica: ', classifica);
 
 	return (
 		<Stack className='h-full'>
@@ -48,7 +76,8 @@ function App() {
 						/>
 						<Box
 							position={[0, 0, 0]}
-							image={team.image_url}
+							// filter by team.id to get the correct image
+							image={foto.find((f) => f.id === team.id)?.src || ''}
 							speed={classifica.length - index}
 						/>
 					</Canvas>
