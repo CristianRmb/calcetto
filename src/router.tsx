@@ -5,8 +5,9 @@ import {
 	Route,
 } from 'react-router-dom';
 
-import App from './App';
 import AuthLayout from './AppLayout';
+import App from './pages/App';
+import ModelsPage from './pages/ModelsPage';
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -16,6 +17,7 @@ export const router = createBrowserRouter(
 			</Route>
 			<Route element={<AuthLayout />}>
 				<Route path='/' element={<App />} />
+				<Route path='/models' element={<ModelsPage />} />
 			</Route>
 		</>
 	),

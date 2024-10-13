@@ -1,21 +1,24 @@
 import { Stack, Typography } from '@mui/material';
-import Box from './3dBox';
+
 import { Canvas } from '@react-three/fiber';
-import { get_ranking } from './api';
+
 import { useEffect, useState } from 'react';
 
-import alessandro from './assets/alessandro.webp';
-import francesco from './assets/francesco.jpg';
-import loris from './assets/loris.jpg';
-import achille from './assets/achille.jpg';
-import mattia from './assets/mattia.jpeg';
-import enrico from './assets/enrico.webp';
-import cristian from './assets/cristian.jpg';
-import laura from './assets/laura.png';
-import cristina from './assets/cristina.jpg';
-import stefano from './assets/stefano.jpeg';
-import claudio from './assets/claudio.jpeg';
-import marco from './assets/marco.jpeg';
+import alessandro from '../assets/alessandro.webp';
+import francesco from '../assets/francesco.jpg';
+import loris from '../assets/loris.jpg';
+import achille from '../assets/achille.jpg';
+import mattia from '../assets/mattia.jpeg';
+import enrico from '../assets/enrico.webp';
+import cristian from '../assets/cristian.jpg';
+import laura from '../assets/laura.png';
+import cristina from '../assets/cristina.jpg';
+import stefano from '../assets/stefano.jpeg';
+import claudio from '../assets/claudio.jpeg';
+import marco from '../assets/marco.jpeg';
+import { get_ranking } from '../api';
+import Box from '../components/3dBox';
+import { OrbitControls } from '@react-three/drei';
 
 interface Team {
 	id: number;
@@ -61,6 +64,7 @@ function App() {
 					alignItems={'center'}
 				>
 					<Canvas style={{ width: '50%' }}>
+						<OrbitControls />
 						<ambientLight intensity={Math.PI / 2} />
 						<spotLight
 							position={[10, 10, 10]}

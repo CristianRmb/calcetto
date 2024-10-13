@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import ChurchIcon from '@mui/icons-material/Church';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
@@ -109,19 +109,23 @@ const Drawer = styled(MuiDrawer, {
 export default function Sidebar() {
 	const theme = useTheme();
 	const [open, setOpen] = React.useState(false);
+	const navigate = useNavigate();
 
 	const menu = [
 		{
 			name: 'Classifica',
 			icon: <SportsSoccerIcon />,
+			url: '/',
 		},
 		{
 			name: 'Santo del giorno',
 			icon: <ChurchIcon />,
+			url: '/',
 		},
 		{
 			name: 'Battuta random ',
 			icon: <SentimentVerySatisfiedIcon />,
+			url: '/models',
 		},
 	];
 
@@ -153,7 +157,7 @@ export default function Sidebar() {
 						<MenuIcon />
 					</IconButton>
 					<Typography variant='h6' noWrap component='div'>
-						Loris Scarso
+						Calcetto SPA 2024
 					</Typography>
 				</Toolbar>
 			</AppBar>
@@ -185,6 +189,7 @@ export default function Sidebar() {
 												justifyContent: 'center',
 										  },
 								]}
+								onClick={() => navigate(item.url)}
 							>
 								<ListItemIcon
 									sx={[
