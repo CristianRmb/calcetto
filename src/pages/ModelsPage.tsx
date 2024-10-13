@@ -1,8 +1,9 @@
-import { OrbitControls, TransformControls } from '@react-three/drei';
+import { Environment, OrbitControls, Sky } from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import { Button, Stack } from '@mui/material';
-import { Model2Avatar } from '../components/Model2Avatar';
+
 import { useState } from 'react';
+import { DefaultAvatar } from '../components/DefaultAvatar';
 
 function ModelsPage() {
 	const [triggerAction, setTriggerAction] = useState({
@@ -18,17 +19,25 @@ function ModelsPage() {
 					height: 'calc(100vh - 64px)',
 				}}
 				shadows
-				camera={{ position: [0, 1, 5], fov: 30 }}
+				camera={{ position: [0, 0.5, 5], fov: 30 }}
 			>
-				<color attach='background' args={['#f0f0f0']} />
-
 				<>
+					<Sky sunPosition={[-100, 50, 100]} />
+					<Environment preset='sunset' />
+
 					<OrbitControls />
 					{/* <TransformControls mode='translate' /> */}
 					<group position-y={-1}>
-						<Model2Avatar triggerAction={triggerAction} />
+						<DefaultAvatar
+							model={'models/Default.glb'}
+							triggerAction={triggerAction}
+						/>
 					</group>
-					<ambientLight intensity={2} />
+					<mesh position-y={-1} scale={5} rotation-x={-Math.PI * 0.5}>
+						<planeGeometry args={[100, 100]} />
+						<meshStandardMaterial color='white' />
+					</mesh>
+					{/* <ambientLight intensity={2} /> */}
 				</>
 			</Canvas>
 			<Stack sx={{ ml: '20px', mt: '30px' }} direction={'row'} gap={2}>

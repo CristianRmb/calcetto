@@ -42,5 +42,16 @@ export default defineConfig({
 			},
 		}),
 	],
+	// esbuild: {
+	// 	jsxInject: `import React from 'react'`,
+	// },
+	// esbuild: {
+	// 	jsxInject: `import React from 'react'`,
+	// },
+	server: {
+		hmr: {
+			overlay: false,
+		},
+	},
 	base: '/calcetto/',
 });
