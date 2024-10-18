@@ -115,7 +115,7 @@ export default function Sidebar() {
 		{
 			name: 'Classifica',
 			icon: <SportsSoccerIcon />,
-			url: '/',
+			url: '/calcetto/',
 		},
 		{
 			name: 'Santo del giorno',
