@@ -9,14 +9,14 @@ export default function useClassificaQuery({}) {
 
 	const setPlayerWinMutation = useMutation({
 		mutationFn: updatePlayerWin,
-		onSuccess: (data) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [`players`] });
 		},
 	});
 
 	const setPlayerLoseMutation = useMutation({
 		mutationFn: updatePlayerLose,
-		onSuccess: (data) => {
+		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: [`players`] });
 		},
 	});

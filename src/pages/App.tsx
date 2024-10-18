@@ -13,7 +13,6 @@ import {
 } from '@mui/material';
 import { Canvas } from '@react-three/fiber';
 import React, { useEffect, useState } from 'react';
-import { get_ranking } from '../api';
 import { Environment, Html, OrbitControls, Sky } from '@react-three/drei';
 import { DefaultAvatar } from '../components/DefaultAvatar';
 
