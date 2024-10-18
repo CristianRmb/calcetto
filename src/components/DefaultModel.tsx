@@ -1,10 +1,39 @@
-// @ts-nocheck
-import React, { useEffect, useState } from 'react';
+import * as THREE from 'three';
+import React, { useEffect } from 'react';
 import { useGraph } from '@react-three/fiber';
 import { useAnimations, useFBX, useGLTF } from '@react-three/drei';
-import { SkeletonUtils } from 'three-stdlib';
+import { GLTF, SkeletonUtils } from 'three-stdlib';
+
+type GLTFResult = GLTF & {
+	nodes: {
+		Wolf3D_Hair: THREE.SkinnedMesh;
+		Wolf3D_Glasses: THREE.SkinnedMesh;
+		Wolf3D_Body: THREE.SkinnedMesh;
+		Wolf3D_Outfit_Bottom: THREE.SkinnedMesh;
+		Wolf3D_Outfit_Footwear: THREE.SkinnedMesh;
+		Wolf3D_Outfit_Top: THREE.SkinnedMesh;
+		EyeLeft: THREE.SkinnedMesh;
+		EyeRight: THREE.SkinnedMesh;
+		Wolf3D_Head: THREE.SkinnedMesh;
+		Wolf3D_Teeth: THREE.SkinnedMesh;
+		Hips: THREE.Bone;
+	};
+	materials: {
+		Wolf3D_Hair: THREE.MeshStandardMaterial;
+		Wolf3D_Glasses: THREE.MeshStandardMaterial;
+		Wolf3D_Body: THREE.MeshStandardMaterial;
+		Wolf3D_Outfit_Bottom: THREE.MeshStandardMaterial;
+		Wolf3D_Outfit_Footwear: THREE.MeshStandardMaterial;
+		Wolf3D_Outfit_Top: THREE.MeshStandardMaterial;
+		Wolf3D_Eye: THREE.MeshStandardMaterial;
+		Wolf3D_Skin: THREE.MeshStandardMaterial;
+		Wolf3D_Teeth: THREE.MeshStandardMaterial;
+	};
+	// animations: GLTFAction[];
+};
 
 interface Player {
+	id: number;
 	model: string;
 	trigger: boolean;
 	action: string;
@@ -14,7 +43,9 @@ interface Player {
 	defaultDefeat: string;
 }
 
-export function DefaultAvatar(props: any) {
+export function DefaultModel(
+	props: JSX.IntrinsicElements['group'] & { player: Player }
+) {
 	const {
 		model,
 		trigger,
@@ -24,15 +55,12 @@ export function DefaultAvatar(props: any) {
 		defaultVictory,
 		defaultDefeat,
 	} = props.player;
-	// force remount on model change
-
 	const { scene } = useGLTF(model);
 	const clone = React.useMemo(() => SkeletonUtils.clone(scene), [scene]);
-	const { nodes, materials } = useGraph(clone);
+	const { nodes, materials } = useGraph(clone) as GLTFResult;
+	const group = React.useRef<THREE.Group>(null);
 
-	const group = React.useRef();
-
-	const animationsMap = {
+	const animationsMap: { [key: string]: any } = {
 		Walking1: useFBX('animations/Walking_1.fbx'),
 		Walking2: useFBX('animations/Walking_2.fbx'),
 		Walking3: useFBX('animations/Walking_3.fbx'),
@@ -50,9 +78,9 @@ export function DefaultAvatar(props: any) {
 	};
 
 	const createAnimations = () => {
-		const actions = {};
+		const actions: { [key: string]: ReturnType<typeof useAnimations> } = {};
 		Object.keys(animationsMap).forEach((key) => {
-			const { animations } = animationsMap[key];
+			const { animations } = animationsMap[key] as any;
 			animations[0].name = key;
 			actions[key] = useAnimations(animations, group);
 		});
@@ -80,12 +108,15 @@ export function DefaultAvatar(props: any) {
 			switch (sendAction) {
 				case 'Victory':
 					animations.Victory.actions[defaultVictory]
-						.setLoop(1, 1)
-						.reset()
-						.play();
+						?.setLoop(THREE.LoopOnce, 1)
+						?.reset()
+						?.play();
 					break;
 				case 'Defeat':
-					animations.Defeat.actions[defaultDefeat].setLoop(1, 1).reset().play();
+					animations.Defeat.actions[defaultDefeat]
+						?.setLoop(THREE.LoopOnce, 1)
+						?.reset()
+						?.play();
 					break;
 				default:
 					break;
@@ -115,6 +146,11 @@ export function DefaultAvatar(props: any) {
 					geometry={nodes.Wolf3D_Hair?.geometry}
 					material={materials.Wolf3D_Hair}
 					skeleton={nodes.Wolf3D_Hair?.skeleton}
+				/>
+				<skinnedMesh
+					geometry={nodes.Wolf3D_Glasses?.geometry}
+					material={materials.Wolf3D_Glasses}
+					skeleton={nodes.Wolf3D_Glasses?.skeleton}
 				/>
 				<skinnedMesh
 					geometry={nodes.Wolf3D_Body?.geometry}

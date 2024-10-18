@@ -10,6 +10,7 @@ import {
 
 import { useState } from 'react';
 import { DefaultAvatar } from '../components/DefaultAvatar';
+import { useMatches } from '../useMatch';
 
 function ModelsPage() {
 	const [player, setPlayer] = useState({
@@ -23,11 +24,13 @@ function ModelsPage() {
 		defaultDefeat: 'Defeat',
 	});
 
+	const match = useMatches();
+
 	return (
-		<Stack direction={'row'}>
+		<Stack direction={{ xs: 'column-reverse', md: 'row' }} gap={2}>
 			<Canvas
 				style={{
-					width: '50vw',
+					width: !match.matchSM ? 'calc(100vw - 58px)' : '50vw',
 					height: 'calc(100vh - 64px)',
 				}}
 				shadows

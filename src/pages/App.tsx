@@ -19,6 +19,9 @@ import { DefaultAvatar } from '../components/DefaultAvatar';
 import { TransitionProps } from '@mui/material/transitions';
 import { useDialog } from '../useDialog';
 import useClassificaQuery from '../useClassificaQuery';
+import { DefaultModel } from '../components/DefaultModel';
+import { SwordIcon } from '../assets/SwordIcon';
+import { ShieldIcon } from '../assets/ShieldIcon';
 
 interface Team {
 	id: number;
@@ -29,6 +32,17 @@ interface Team {
 	briscola_total_match: number;
 	briscola_win_match: number;
 	params: {};
+}
+
+interface Player {
+	id: number;
+	model: string;
+	trigger: boolean;
+	action: string;
+	defaultAction: string;
+	sendAction: string;
+	defaultVictory: string;
+	defaultDefeat: string;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -70,7 +84,7 @@ function App() {
 	const handleClose = () => {
 		setOpen(false);
 	};
-	const [players, setPlayers] = useState([
+	const [players, setPlayers] = useState<Player[]>([
 		{
 			id: 1,
 			model: 'models/Loris.glb',
@@ -252,35 +266,52 @@ function App() {
 				aria-describedby='alert-dialog-slide-description'
 			>
 				<DialogContent className='!p-0 !m-0'>
-					<Stack>
+					<Stack width={'300px'} height={'200px'}>
 						<Stack
 							bgcolor={'yellow'}
 							direction={'row'}
 							gap={2}
 							className='py-3 px-2'
-							justifyContent={'center'}
+							justifyContent={'space-around'}
+							alignItems={'center'}
+							flex={1}
+							sx={{ borderBottom: '1px solid black' }}
 						>
-							<Typography fontSize={'18'}>
-								{randomTeams.team1[0]?.name + ' - '}
-							</Typography>
-							<Typography fontSize={'18'}>
-								{randomTeams.team1[1]?.name}
-							</Typography>
+							<Stack direction={'row'} gap={2}>
+								<SwordIcon />
+								<Typography fontSize={'18'}>
+									{randomTeams.team1[0]?.name}
+								</Typography>
+							</Stack>
+							<Stack direction={'row'} gap={2}>
+								<ShieldIcon />
+								<Typography fontSize={'18'}>
+									{randomTeams.team1[1]?.name}
+								</Typography>
+							</Stack>
 						</Stack>
 
 						<Stack
+							flex={1}
 							bgcolor={'lightblue'}
 							direction={'row'}
+							alignItems={'center'}
 							gap={2}
 							className='py-3 px-2'
-							justifyContent={'center'}
+							justifyContent={'space-around'}
 						>
-							<Typography fontSize={'18'}>
-								{randomTeams.team2[0]?.name + ' - '}
-							</Typography>
-							<Typography fontSize={'18'}>
-								{randomTeams.team2[1]?.name}
-							</Typography>
+							<Stack direction={'row'} gap={2}>
+								<SwordIcon />
+								<Typography fontSize={'18'}>
+									{randomTeams.team2[0]?.name}
+								</Typography>
+							</Stack>
+							<Stack direction={'row'} gap={2}>
+								<ShieldIcon />
+								<Typography fontSize={'18'}>
+									{randomTeams.team2[1]?.name}
+								</Typography>
+							</Stack>
 						</Stack>
 					</Stack>
 				</DialogContent>
@@ -324,15 +355,6 @@ function App() {
 					</Button>
 					<Button
 						onClick={() => {
-							// const newPlayers = [...players];
-							// const player = newPlayers.find(
-							// 	(f) => f.id === confirmDialog.data.id
-							// );
-							// if (player) {
-							// 	player.trigger = !player.trigger;
-							// 	player.sendAction = 'Defeat';
-							// }
-							// setPlayers(newPlayers);
 							confirmDialog.handleClose({});
 						}}
 						variant='contained'
@@ -343,7 +365,7 @@ function App() {
 				</DialogActions>
 			</Dialog>
 			<Grid2
-				id='grid_data'
+				id='grid_data_!23'
 				width={'100%'}
 				container
 				spacing={2}
@@ -354,7 +376,8 @@ function App() {
 						direction={'row'}
 						justifyContent={'space-between'}
 						alignItems={'center'}
-						id='team'
+						id={`team_${team.id}`}
+						key={`team_${team.id}`}
 					>
 						<Canvas
 							style={{
@@ -365,7 +388,8 @@ function App() {
 							}}
 							shadows
 							camera={{ position: [0, 0.5, 5], fov: 30 }}
-							id='canvas'
+							id={`canvas_${team.id}`}
+							key={`canvas_${team.id}`}
 						>
 							<Html
 								style={{
@@ -380,7 +404,7 @@ function App() {
 									direction={'column'}
 									height={'368px'}
 									width={220}
-									id='form-data'
+									id={`stack_1_${team.id}`}
 									justifyContent={'space-between'}
 								>
 									<Stack
@@ -388,6 +412,8 @@ function App() {
 										gap={2}
 										alignItems={'center'}
 										justifyContent={'space-between'}
+										id={`stack_2_${team.id}`}
+										key={`stack_2_${team.id}`}
 									>
 										<Typography fontSize={'18px'}>{index + 1}</Typography>
 
@@ -410,6 +436,8 @@ function App() {
 										gap={2}
 										alignItems={'center'}
 										justifyContent={'center'}
+										id={`stack_3_${team.id}`}
+										key={`stack_3_${team.id}`}
 									>
 										<Button
 											variant='contained'
@@ -472,8 +500,11 @@ function App() {
 								<Environment preset='sunset' />
 
 								<group position-y={-1}>
-									<DefaultAvatar
+									{/* <DefaultAvatar
 										player={players.find((f) => f.id === team.id)}
+									/> */}
+									<DefaultModel
+										player={players.find((f) => f.id === team.id) as Player}
 									/>
 								</group>
 								<mesh position-y={-1} scale={5} rotation-x={-Math.PI * 0.5}>
