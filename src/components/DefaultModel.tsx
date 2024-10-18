@@ -49,7 +49,6 @@ export function DefaultModel(
 	const {
 		model,
 		trigger,
-		action,
 		defaultAction,
 		sendAction,
 		defaultVictory,

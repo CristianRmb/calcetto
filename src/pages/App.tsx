@@ -14,7 +14,6 @@ import {
 import { Canvas } from '@react-three/fiber';
 import React, { useEffect, useState } from 'react';
 import { Environment, Html, OrbitControls, Sky } from '@react-three/drei';
-import { DefaultAvatar } from '../components/DefaultAvatar';
 
 import { TransitionProps } from '@mui/material/transitions';
 import { useDialog } from '../useDialog';
