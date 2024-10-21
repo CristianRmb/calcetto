@@ -11,7 +11,6 @@ import {
 	Stack,
 	styled,
 } from '@mui/material';
-import { useMatches } from '../useMatch';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import CardMedia from '@mui/material/CardMedia';
@@ -110,8 +109,6 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 function RicetteRandom() {
-	// const match = useMatches();
-
 	const [ricetta, setRicetta] = useState<Ricetta>();
 	const [ingredients, setIngredients] = useState<string[]>([]);
 
