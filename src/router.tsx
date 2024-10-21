@@ -8,6 +8,7 @@ import {
 import AuthLayout from './AppLayout';
 import App from './pages/App';
 import ModelsPage from './pages/ModelsPage';
+import RicetteRandom from './pages/RicetteRandom';
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -18,6 +19,7 @@ export const router = createBrowserRouter(
 			<Route element={<AuthLayout />}>
 				<Route path='/' element={<App />} />
 				<Route path='/models' element={<ModelsPage />} />
+				<Route path='/ricettarandom' element={<RicetteRandom />} />
 			</Route>
 		</>
 	),

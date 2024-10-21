@@ -19,7 +19,8 @@ import ListItemText from '@mui/material/ListItemText';
 
 import { Outlet, useNavigate } from 'react-router-dom';
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import ChurchIcon from '@mui/icons-material/Church';
+// import ChurchIcon from '@mui/icons-material/Church';
+import CookieIcon from '@mui/icons-material/Cookie';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 
 const drawerWidth = 240;
@@ -118,9 +119,9 @@ export default function Sidebar() {
 			url: '/calcetto/',
 		},
 		{
-			name: 'Santo del giorno',
-			icon: <ChurchIcon />,
-			url: '/',
+			name: 'Ricetta random',
+			icon: <CookieIcon />,
+			url: '/ricettarandom',
 		},
 		{
 			name: 'Battuta random ',
