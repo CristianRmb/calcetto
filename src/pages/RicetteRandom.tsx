@@ -128,11 +128,12 @@ function RicetteRandom() {
 	};
 
 	useEffect(() => {
-		console.log('RicetteRandom', match);
-
 		axios
 			.get('https://www.themealdb.com/api/json/v1/1/random.php')
 			.then((response) => {
+				// @ts-ignore
+				response.data.meals[0].strYoutube =
+					response.data.meals[0].strYoutube.replace('watch?v=', 'embed/');
 				setRicetta(response.data.meals[0]);
 			});
 	}, []);
