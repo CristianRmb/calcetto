@@ -70,6 +70,7 @@ function App() {
 		classificaFetching,
 		setPlayerLose,
 		setPlayerWin,
+		setMatch,
 	} = useClassificaQuery({});
 
 	const confirmDialog = useDialog();
@@ -268,53 +269,114 @@ function App() {
 					<Stack width={'300px'} height={'200px'}>
 						<Stack
 							bgcolor={'yellow'}
-							direction={'row'}
-							gap={2}
-							className='py-3 px-2'
-							justifyContent={'space-around'}
-							alignItems={'center'}
-							flex={1}
-							sx={{ borderBottom: '1px solid black' }}
+							gap={0}
+							sx={{ borderBottom: '1px solid black', pb: '20px' }}
+							justifyContent={'center'}
+							alignContent={'center'}
+							width={'100%'}
 						>
-							<Stack direction={'row'} gap={2}>
-								<SwordIcon />
-								<Typography fontSize={'18'}>
-									{randomTeams.team1[0]?.name}
-								</Typography>
+							<Stack
+								bgcolor={'yellow'}
+								direction={'row'}
+								gap={2}
+								className='py-3 px-2'
+								justifyContent={'space-around'}
+								alignItems={'center'}
+								flex={1}
+							>
+								<Stack direction={'row'} gap={2}>
+									<SwordIcon />
+									<Typography fontSize={'18'}>
+										{randomTeams.team1[0]?.name}
+									</Typography>
+								</Stack>
+								<Stack direction={'row'} gap={2}>
+									<ShieldIcon />
+									<Typography fontSize={'18'}>
+										{randomTeams.team1[1]?.name}
+									</Typography>
+								</Stack>
 							</Stack>
-							<Stack direction={'row'} gap={2}>
-								<ShieldIcon />
-								<Typography fontSize={'18'}>
-									{randomTeams.team1[1]?.name}
-								</Typography>
-							</Stack>
+							<Button
+								sx={{ width: 'min-content', ml: 'auto', mr: 'auto' }}
+								variant='contained'
+								color='success'
+								onClick={() => {
+									console.log('Team1 : ', randomTeams.team1[0]);
+									const winner_1 = randomTeams.team1[0]?.id;
+									const winner_2 = randomTeams.team1[1]?.id;
+									const loser_1 = randomTeams.team2[0]?.id;
+									const loser_2 = randomTeams.team2[1]?.id;
+
+									setMatch({
+										winner_1: winner_1,
+										winner_2: winner_2,
+										loser_1: loser_1,
+										loser_2: loser_2,
+									});
+									handleClose();
+								}}
+							>
+								Vinto
+							</Button>
 						</Stack>
 
 						<Stack
-							flex={1}
 							bgcolor={'lightblue'}
-							direction={'row'}
-							alignItems={'center'}
-							gap={2}
-							className='py-3 px-2'
-							justifyContent={'space-around'}
+							gap={0}
+							sx={{ borderBottom: '1px solid black', pb: '20px' }}
+							justifyContent={'center'}
+							alignContent={'center'}
+							width={'100%'}
 						>
-							<Stack direction={'row'} gap={2}>
-								<SwordIcon />
-								<Typography fontSize={'18'}>
-									{randomTeams.team2[0]?.name}
-								</Typography>
+							<Stack
+								flex={1}
+								bgcolor={'lightblue'}
+								direction={'row'}
+								alignItems={'center'}
+								gap={2}
+								className='py-3 px-2'
+								justifyContent={'space-around'}
+							>
+								<Stack direction={'row'} gap={2}>
+									<SwordIcon />
+									<Typography fontSize={'18'}>
+										{randomTeams.team2[0]?.name}
+									</Typography>
+								</Stack>
+								<Stack direction={'row'} gap={2}>
+									<ShieldIcon />
+									<Typography fontSize={'18'}>
+										{randomTeams.team2[1]?.name}
+									</Typography>
+								</Stack>
 							</Stack>
-							<Stack direction={'row'} gap={2}>
-								<ShieldIcon />
-								<Typography fontSize={'18'}>
-									{randomTeams.team2[1]?.name}
-								</Typography>
-							</Stack>
+							<Button
+								sx={{ width: 'min-content', ml: 'auto', mr: 'auto' }}
+								variant='contained'
+								color='success'
+								onClick={() => {
+									console.log('Team2 : ', randomTeams.team2[0]);
+									const winner_1 = randomTeams.team2[0]?.id;
+									const winner_2 = randomTeams.team2[1]?.id;
+									const loser_1 = randomTeams.team1[0]?.id;
+									const loser_2 = randomTeams.team1[1]?.id;
+
+									setMatch({
+										winner_1: winner_1,
+										winner_2: winner_2,
+										loser_1: loser_1,
+										loser_2: loser_2,
+									});
+									handleClose();
+								}}
+							>
+								Vinto
+							</Button>
 						</Stack>
 					</Stack>
 				</DialogContent>
-			</Dialog>{' '}
+			</Dialog>
 			<Dialog
 				open={confirmDialog.open}
 				onClose={confirmDialog.handleClose}

@@ -10,6 +10,18 @@ interface Team {
 	params: {};
 }
 
+interface MatchInput {
+	winner_1: number;
+	winner_2: number;
+	loser_1: number;
+	loser_2: number;
+}
+
+interface MatchResponse {
+	success: boolean; // Adjust based on the actual response structure
+	data: any; // Replace with a specific type if you know it
+}
+
 // response.data is []Team
 const get_ranking = async (): Promise<Team[] | null> => {
 	try {
@@ -45,4 +57,17 @@ const updatePlayerLose = async (player_id: number) => {
 	}
 };
 
-export { get_ranking, updatePlayerWin, updatePlayerLose };
+const createMatch = async (matchInput: MatchInput): Promise<MatchResponse> => {
+	try {
+		const response = await axios.post<MatchResponse>(
+			`https://mazino.pythonanywhere.com/calcetto/create_match/`,
+			matchInput
+		);
+		return response.data;
+	} catch (error) {
+		console.error('Error creating match:', error);
+		throw error;
+	}
+};
+
+export { get_ranking, updatePlayerWin, updatePlayerLose, createMatch };
