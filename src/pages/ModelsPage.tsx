@@ -76,6 +76,8 @@ function ModelsPage() {
 						<MenuItem value={'Walking4'}>Walking4</MenuItem>
 						<MenuItem value={'Walking5'}>Walking5</MenuItem>
 						<MenuItem value={'Walking6'}>Walking6</MenuItem>
+						<MenuItem value={'Walking7'}>Walking7</MenuItem>
+						<MenuItem value={'Walking8'}>Walking8</MenuItem>
 						<MenuItem value={'Injured_Walking'}>Injured Walking</MenuItem>
 						<MenuItem value={'Old_Man_Walk'}>Old Man Walk</MenuItem>
 						<MenuItem value={'Walker_Walk'}>Walker Walk</MenuItem>

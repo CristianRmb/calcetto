@@ -59,22 +59,44 @@ export function DefaultModel(
 	const { nodes, materials } = useGraph(clone) as GLTFResult;
 	const group = React.useRef<THREE.Group>(null);
 
-	const animationsMap: { [key: string]: any } = {
-		Walking1: useFBX('animations/Walking_1.fbx'),
-		Walking2: useFBX('animations/Walking_2.fbx'),
-		Walking3: useFBX('animations/Walking_3.fbx'),
-		Walking4: useFBX('animations/Walking_4.fbx'),
-		Walking5: useFBX('animations/Walking_5.fbx'),
-		Walking6: useFBX('animations/Walking_6.fbx'),
-		Old_Man_Walk: useFBX('animations/Old_Man_Walk.fbx'),
-		Injured_Walking: useFBX('animations/Injured_Walking.fbx'),
-		Walker_Walk: useFBX('animations/Walker_Walk.fbx'),
-		Sneak_Walk: useFBX('animations/Sneak_Walk.fbx'),
-		Crouched_Walking: useFBX('animations/Crouched_Walking.fbx'),
-		Catwalk_Walk: useFBX('animations/Catwalk_Walk.fbx'),
-		Victory: useFBX('animations/Victory.fbx'),
-		Defeat: useFBX('animations/Defeat.fbx'),
-	};
+	// const animationsMap: { [key: string]: any } = {
+	// 	Walking1: useFBX('animations/Walking_1.fbx'),
+	// 	Walking2: useFBX('animations/Walking_2.fbx'),
+	// 	Walking3: useFBX('animations/Walking_3.fbx'),
+	// 	Walking4: useFBX('animations/Walking_4.fbx'),
+	// 	Walking5: useFBX('animations/Walking_5.fbx'),
+	// 	Walking6: useFBX('animations/Walking_6.fbx'),
+	// 	Old_Man_Walk: useFBX('animations/Old_Man_Walk.fbx'),
+	// 	Injured_Walking: useFBX('animations/Injured_Walking.fbx'),
+	// 	Walker_Walk: useFBX('animations/Walker_Walk.fbx'),
+	// 	Sneak_Walk: useFBX('animations/Sneak_Walk.fbx'),
+	// 	Crouched_Walking: useFBX('animations/Crouched_Walking.fbx'),
+	// 	Catwalk_Walk: useFBX('animations/Catwalk_Walk.fbx'),
+	// 	Victory: useFBX('animations/Victory.fbx'),
+	// 	Defeat: useFBX('animations/Defeat.fbx'),
+	// };
+
+	const animationsMap: { [key: string]: any } = React.useMemo(
+		() => ({
+			Walking1: useFBX('animations/Walking_1.fbx'),
+			Walking2: useFBX('animations/Walking_2.fbx'),
+			Walking3: useFBX('animations/Walking_3.fbx'),
+			Walking4: useFBX('animations/Walking_4.fbx'),
+			Walking5: useFBX('animations/Walking_5.fbx'),
+			Walking6: useFBX('animations/Walking_6.fbx'),
+			Walking7: useFBX('animations/Walking_7.fbx'),
+			Walking8: useFBX('animations/Walking_8.fbx'),
+			Old_Man_Walk: useFBX('animations/Old_Man_Walk.fbx'),
+			Injured_Walking: useFBX('animations/Injured_Walking.fbx'),
+			Walker_Walk: useFBX('animations/Walker_Walk.fbx'),
+			Sneak_Walk: useFBX('animations/Sneak_Walk.fbx'),
+			Crouched_Walking: useFBX('animations/Crouched_Walking.fbx'),
+			Catwalk_Walk: useFBX('animations/Catwalk_Walk.fbx'),
+			Victory: useFBX('animations/Victory.fbx'),
+			Defeat: useFBX('animations/Defeat.fbx'),
+		}),
+		[]
+	);
 
 	const createAnimations = () => {
 		const actions: { [key: string]: ReturnType<typeof useAnimations> } = {};
