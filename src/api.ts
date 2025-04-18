@@ -22,6 +22,12 @@ interface MatchResponse {
 	data: any; // Replace with a specific type if you know it
 }
 
+interface PlayerAnimation {
+	id: number;
+	name: string;
+	defaultAction: string;
+}
+
 // response.data is []Team
 const get_ranking = async (): Promise<Team[] | null> => {
 	try {
@@ -70,4 +76,26 @@ const createMatch = async (matchInput: MatchInput): Promise<MatchResponse> => {
 	}
 };
 
-export { get_ranking, updatePlayerWin, updatePlayerLose, createMatch };
+const savePlayerAnimation = async (
+	playerData: PlayerAnimation
+): Promise<boolean> => {
+	try {
+		// In una vera implementazione, questa chiamata andrebbe ad un endpoint server
+		// che salverebbe i dati nel file models_settings.json
+		console.log('Salvando animazione per:', playerData);
+
+		// Per ora simula un successo
+		return true;
+	} catch (error) {
+		console.error("Errore nel salvare l'animazione:", error);
+		return false;
+	}
+};
+
+export {
+	get_ranking,
+	updatePlayerWin,
+	updatePlayerLose,
+	createMatch,
+	savePlayerAnimation,
+};

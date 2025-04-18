@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import React, { useEffect, useMemo } from 'react';
-import { useGraph } from '@react-three/fiber';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useFrame, useGraph } from '@react-three/fiber';
 import { useAnimations, useFBX, useGLTF } from '@react-three/drei';
 import { GLTF, SkeletonUtils } from 'three-stdlib';
 
@@ -40,6 +40,7 @@ interface Player {
 	sendAction: string;
 	defaultVictory: string;
 	defaultDefeat: string;
+	name?: string;
 }
 
 export function DefaultModel(
@@ -54,14 +55,13 @@ export function DefaultModel(
 		defaultDefeat,
 	} = props.player;
 
-	// Usa il caching per i modelli
+	// Load the model and handle fallback
 	const { scene } = useGLTF(model);
 	const clone = useMemo(() => SkeletonUtils.clone(scene), [scene]);
 	const { nodes, materials } = useGraph(clone) as GLTFResult;
-	const group = React.useRef<THREE.Group>(null);
+	const group = useRef<THREE.Group>(null);
 
-	// Carica tutti gli hooks necessari in modo incondizionale
-	// questo rispetta le regole degli hooks React
+	// Carica tutte le animazioni in modo incondizionale
 	const walking1Animation = useFBX('animations/Walking_1.fbx');
 	const walking2Animation = useFBX('animations/Walking_2.fbx');
 	const walking3Animation = useFBX('animations/Walking_3.fbx');
@@ -79,172 +79,176 @@ export function DefaultModel(
 	const victoryAnimation = useFBX('animations/Victory.fbx');
 	const defeatAnimation = useFBX('animations/Defeat.fbx');
 
-	// Mappa delle animazioni caricate
-	const animationMap = useMemo(
-		() => ({
-			Walking1: walking1Animation,
-			Walking2: walking2Animation,
-			Walking3: walking3Animation,
-			Walking4: walking4Animation,
-			Walking5: walking5Animation,
-			Walking6: walking6Animation,
-			Walking7: walking7Animation,
-			Walking8: walking8Animation,
-			Old_Man_Walk: oldManWalkAnimation,
-			Injured_Walking: injuredWalkingAnimation,
-			Walker_Walk: walkerWalkAnimation,
-			Sneak_Walk: sneakWalkAnimation,
-			Crouched_Walking: crouchedWalkingAnimation,
-			Catwalk_Walk: catwalkWalkAnimation,
-			Victory: victoryAnimation,
-			Defeat: defeatAnimation,
-		}),
-		[
-			walking1Animation,
-			walking2Animation,
-			walking3Animation,
-			walking4Animation,
-			walking5Animation,
-			walking6Animation,
-			walking7Animation,
-			walking8Animation,
-			oldManWalkAnimation,
-			injuredWalkingAnimation,
-			walkerWalkAnimation,
-			sneakWalkAnimation,
-			crouchedWalkingAnimation,
-			catwalkWalkAnimation,
-			victoryAnimation,
-			defeatAnimation,
-		]
-	);
+	// Rinomina tutte le animazioni
+	walking1Animation.animations[0].name = 'Walking1';
+	walking2Animation.animations[0].name = 'Walking2';
+	walking3Animation.animations[0].name = 'Walking3';
+	walking4Animation.animations[0].name = 'Walking4';
+	walking5Animation.animations[0].name = 'Walking5';
+	walking6Animation.animations[0].name = 'Walking6';
+	walking7Animation.animations[0].name = 'Walking7';
+	walking8Animation.animations[0].name = 'Walking8';
+	oldManWalkAnimation.animations[0].name = 'Old_Man_Walk';
+	injuredWalkingAnimation.animations[0].name = 'Injured_Walking';
+	walkerWalkAnimation.animations[0].name = 'Walker_Walk';
+	sneakWalkAnimation.animations[0].name = 'Sneak_Walk';
+	crouchedWalkingAnimation.animations[0].name = 'Crouched_Walking';
+	catwalkWalkAnimation.animations[0].name = 'Catwalk_Walk';
+	victoryAnimation.animations[0].name = 'Victory';
+	defeatAnimation.animations[0].name = 'Defeat';
 
-	// Ora possiamo utilizzare la mappa in modo sicuro con useMemo
-	const createAnimations = useMemo(() => {
-		const actions: { [key: string]: ReturnType<typeof useAnimations> } = {};
-		const keys = new Set(
-			[defaultAction, sendAction, defaultVictory, defaultDefeat].filter(Boolean)
-		);
+	// Aggiungi tutte le animazioni a un array
+	const animations = [
+		walking1Animation.animations[0],
+		walking2Animation.animations[0],
+		walking3Animation.animations[0],
+		walking4Animation.animations[0],
+		walking5Animation.animations[0],
+		walking6Animation.animations[0],
+		walking7Animation.animations[0],
+		walking8Animation.animations[0],
+		oldManWalkAnimation.animations[0],
+		injuredWalkingAnimation.animations[0],
+		walkerWalkAnimation.animations[0],
+		sneakWalkAnimation.animations[0],
+		crouchedWalkingAnimation.animations[0],
+		catwalkWalkAnimation.animations[0],
+		victoryAnimation.animations[0],
+		defeatAnimation.animations[0],
+	];
 
-		keys.forEach((key) => {
-			//@ts-ignore
-			if (key && animationMap[key]) {
-				// @ts-ignore
-				const { animations } = animationMap[key] as any;
-				animations[0].name = key;
-				actions[key] = useAnimations(animations, group);
-			}
-		});
+	// Usa il hook useAnimations standard fornito da drei
+	const { actions } = useAnimations(animations, group);
+	const activeAction = useRef('');
 
-		return actions;
-	}, [animationMap, defaultAction, sendAction, defaultVictory, defaultDefeat]);
-
-	const animations = createAnimations;
-
-	// Esegui le azioni di default
-	useEffect(() => {
-		if (defaultAction && animations[defaultAction]) {
-			changeAction(defaultAction, '');
+	// Simple helper function to play an animation
+	const playAnimation = (name: string) => {
+		// Stop all current animations
+		if (activeAction.current && actions[activeAction.current]) {
+			// @ts-ignore
+			actions[activeAction.current].fadeOut(0.3);
 		}
-	}, [defaultAction, animations]);
 
-	useEffect(() => {
-		if (sendAction && animations[sendAction]) {
-			changeAction(sendAction, defaultAction);
+		// Start the new animation
+		if (actions[name]) {
+			actions[name].reset().fadeIn(0.3).play();
+			activeAction.current = name;
 		}
-	}, [sendAction, animations, defaultAction]);
+	};
 
-	// Gestione del trigger per azioni specifiche come Victory/Defeat
+	// Esegui l'animazione di default quando il componente viene montato
+	useEffect(() => {
+		if (defaultAction && actions[defaultAction]) {
+			// Configurazione iniziale dell'animazione predefinita
+			playAnimation(defaultAction);
+		}
+	}, [defaultAction, actions]);
+
+	// Gestisci il cambio di animazione quando sendAction cambia
+	useEffect(() => {
+		if (
+			sendAction &&
+			sendAction !== activeAction.current &&
+			actions[sendAction]
+		) {
+			playAnimation(sendAction);
+		}
+	}, [sendAction, actions]);
+
+	// Gestione del trigger per victory/defeat
 	useEffect(() => {
 		if (trigger) {
-			switch (sendAction) {
-				case 'Victory':
-					animations.Victory?.actions[defaultVictory]
-						?.setLoop(THREE.LoopOnce, 1)
-						?.reset()
-						?.play();
-					break;
-				case 'Defeat':
-					animations.Defeat?.actions[defaultDefeat]
-						?.setLoop(THREE.LoopOnce, 1)
-						?.reset()
-						?.play();
-					break;
-				default:
-					break;
+			if (sendAction === 'Victory' && actions['Victory']) {
+				actions['Victory'].reset().fadeIn(0.3).play();
+				activeAction.current = 'Victory';
+
+				// Torna all'animazione predefinita dopo 2 secondi
+				const timer = setTimeout(() => {
+					if (defaultAction && actions[defaultAction]) {
+						playAnimation(defaultAction);
+					}
+				}, 2000);
+
+				return () => clearTimeout(timer);
+			} else if (sendAction === 'Defeat' && actions['Defeat']) {
+				actions['Defeat'].reset().fadeIn(0.3).play();
+				activeAction.current = 'Defeat';
+
+				// Torna all'animazione predefinita dopo 2 secondi
+				const timer = setTimeout(() => {
+					if (defaultAction && actions[defaultAction]) {
+						playAnimation(defaultAction);
+					}
+				}, 2000);
+
+				return () => clearTimeout(timer);
 			}
 		}
-	}, [trigger, sendAction, defaultVictory, defaultDefeat, animations]);
+	}, [trigger, sendAction, defaultAction, actions]);
 
-	const stopAllAnimations = (exclude: string) => {
-		Object.keys(animations).forEach((key) => {
-			if (key !== exclude && animations[key]) {
-				animations[key].actions[key]?.stop();
-			}
-		});
-	};
-
-	// Cambia l'azione corrente
-	const changeAction = (action: string, previousAction: string) => {
-		stopAllAnimations(previousAction);
-		animations[action]?.actions[action]?.reset().play();
-	};
-
-	// Ottimizzazione dei materiali
-	useMemo(() => {
-		Object.values(materials).forEach((material) => {
-			material.roughness = 0.8; // Riduce la qualità dei riflessi
-			material.envMapIntensity = 0.5; // Riduce l'intensità della mappa ambientale
-		});
+	// Ottimizza i materiali
+	useEffect(() => {
+		if (materials) {
+			Object.values(materials).forEach((material) => {
+				material.roughness = 0.8;
+				material.envMapIntensity = 0.5;
+			});
+		}
 	}, [materials]);
+
+	// Debug con useFrame (commentato)
+	useFrame(() => {
+		// Per debugging, se necessario
+		// console.log(`Modello: ${model}, Animazione attiva: ${activeAction.current}`);
+	});
 
 	return (
 		<group key={model} rotation-x={-Math.PI / 2} rotation-z={0.1}>
 			<group ref={group} {...props} dispose={null}>
-				<primitive object={nodes.Hips} />
-				{nodes.Wolf3D_Hair && (
+				{nodes?.Hips && <primitive object={nodes.Hips} />}
+				{nodes?.Wolf3D_Hair && (
 					<skinnedMesh
 						geometry={nodes.Wolf3D_Hair.geometry}
 						material={materials.Wolf3D_Hair}
 						skeleton={nodes.Wolf3D_Hair.skeleton}
 					/>
 				)}
-				{nodes.Wolf3D_Glasses && (
+				{nodes?.Wolf3D_Glasses && (
 					<skinnedMesh
 						geometry={nodes.Wolf3D_Glasses.geometry}
 						material={materials.Wolf3D_Glasses}
 						skeleton={nodes.Wolf3D_Glasses.skeleton}
 					/>
 				)}
-				{nodes.Wolf3D_Body && (
+				{nodes?.Wolf3D_Body && (
 					<skinnedMesh
 						geometry={nodes.Wolf3D_Body.geometry}
 						material={materials.Wolf3D_Body}
 						skeleton={nodes.Wolf3D_Body.skeleton}
 					/>
 				)}
-				{nodes.Wolf3D_Outfit_Bottom && (
+				{nodes?.Wolf3D_Outfit_Bottom && (
 					<skinnedMesh
 						geometry={nodes.Wolf3D_Outfit_Bottom.geometry}
 						material={materials.Wolf3D_Outfit_Bottom}
 						skeleton={nodes.Wolf3D_Outfit_Bottom.skeleton}
 					/>
 				)}
-				{nodes.Wolf3D_Outfit_Footwear && (
+				{nodes?.Wolf3D_Outfit_Footwear && (
 					<skinnedMesh
 						geometry={nodes.Wolf3D_Outfit_Footwear.geometry}
 						material={materials.Wolf3D_Outfit_Footwear}
 						skeleton={nodes.Wolf3D_Outfit_Footwear.skeleton}
 					/>
 				)}
-				{nodes.Wolf3D_Outfit_Top && (
+				{nodes?.Wolf3D_Outfit_Top && (
 					<skinnedMesh
 						geometry={nodes.Wolf3D_Outfit_Top.geometry}
 						material={materials.Wolf3D_Outfit_Top}
 						skeleton={nodes.Wolf3D_Outfit_Top.skeleton}
 					/>
 				)}
-				{nodes.EyeLeft && (
+				{nodes?.EyeLeft && (
 					<skinnedMesh
 						name='EyeLeft'
 						geometry={nodes.EyeLeft.geometry}
@@ -254,7 +258,7 @@ export function DefaultModel(
 						morphTargetInfluences={nodes.EyeLeft.morphTargetInfluences}
 					/>
 				)}
-				{nodes.EyeRight && (
+				{nodes?.EyeRight && (
 					<skinnedMesh
 						name='EyeRight'
 						geometry={nodes.EyeRight.geometry}
@@ -264,7 +268,7 @@ export function DefaultModel(
 						morphTargetInfluences={nodes.EyeRight.morphTargetInfluences}
 					/>
 				)}
-				{nodes.Wolf3D_Head && (
+				{nodes?.Wolf3D_Head && (
 					<skinnedMesh
 						name='Wolf3D_Head'
 						geometry={nodes.Wolf3D_Head.geometry}
@@ -274,7 +278,7 @@ export function DefaultModel(
 						morphTargetInfluences={nodes.Wolf3D_Head.morphTargetInfluences}
 					/>
 				)}
-				{nodes.Wolf3D_Teeth && (
+				{nodes?.Wolf3D_Teeth && (
 					<skinnedMesh
 						name='Wolf3D_Teeth'
 						geometry={nodes.Wolf3D_Teeth.geometry}

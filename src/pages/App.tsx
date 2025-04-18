@@ -7,8 +7,12 @@ import {
 	DialogContent,
 	DialogTitle,
 	Grid2,
+	IconButton,
+	Menu,
+	MenuItem,
 	Slide,
 	Stack,
+	Tooltip,
 	Typography,
 } from '@mui/material';
 import { Canvas } from '@react-three/fiber';
@@ -18,8 +22,11 @@ import React, {
 	Suspense,
 	useMemo,
 	useCallback,
+	useRef,
 } from 'react';
 import { Environment, Html, OrbitControls, Sky } from '@react-three/drei';
+import EditIcon from '@mui/icons-material/Edit';
+import { savePlayerAnimation } from '../api';
 
 import { TransitionProps } from '@mui/material/transitions';
 import { useDialog } from '../useDialog';
@@ -48,6 +55,7 @@ interface Player {
 	sendAction: string;
 	defaultVictory: string;
 	defaultDefeat: string;
+	name?: string;
 }
 
 const Transition = React.forwardRef(function Transition(
@@ -70,6 +78,80 @@ function App() {
 		team2: [],
 	});
 
+	// Stati per gestire il menu dropdown delle animazioni
+	const [animationMenuAnchor, setAnimationMenuAnchor] =
+		useState<null | HTMLElement>(null);
+	const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
+
+	// Lista delle animazioni disponibili
+	const availableAnimations = [
+		{ name: 'Walking 1', value: 'Walking1' },
+		{ name: 'Walking 2', value: 'Walking2' },
+		{ name: 'Walking 3', value: 'Walking3' },
+		{ name: 'Walking 4', value: 'Walking4' },
+		{ name: 'Walking 5', value: 'Walking5' },
+		{ name: 'Walking 6', value: 'Walking6' },
+		{ name: 'Walking 7', value: 'Walking7' },
+		{ name: 'Walking 8', value: 'Walking8' },
+		{ name: 'Old Man Walk', value: 'Old_Man_Walk' },
+		{ name: 'Injured Walking', value: 'Injured_Walking' },
+		{ name: 'Walker Walk', value: 'Walker_Walk' },
+		{ name: 'Sneak Walk', value: 'Sneak_Walk' },
+		{ name: 'Crouched Walking', value: 'Crouched_Walking' },
+		{ name: 'Catwalk Walk', value: 'Catwalk_Walk' },
+	];
+
+	// Gestione apertura menu
+	const handleAnimationMenuOpen = (
+		event: React.MouseEvent<HTMLElement>,
+		playerId: number
+	) => {
+		setAnimationMenuAnchor(event.currentTarget);
+		setSelectedPlayerId(playerId);
+	};
+
+	// Gestione chiusura menu
+	const handleAnimationMenuClose = () => {
+		setAnimationMenuAnchor(null);
+		setSelectedPlayerId(null);
+	};
+
+	// Funzione per cambiare l'animazione di un player
+	const changePlayerAnimation = (animation: string) => {
+		if (selectedPlayerId === null) return;
+
+		// Aggiorna lo state dei player
+		const newPlayers = [...players];
+		const playerIndex = newPlayers.findIndex((p) => p.id === selectedPlayerId);
+
+		if (playerIndex !== -1) {
+			newPlayers[playerIndex] = {
+				...newPlayers[playerIndex],
+				defaultAction: animation,
+			};
+			setPlayers(newPlayers);
+
+			// Salva nel file JSON
+			// savePlayerAnimation(newPlayers[playerIndex]);
+		}
+
+		handleAnimationMenuClose();
+	};
+
+	// Funzione per salvare le impostazioni nel file JSON
+	const savePlayerSettings = (updatedPlayer: Player) => {
+		// Non possiamo scrivere direttamente nel file, quindi mostriamo solo un log
+		console.log('Salvataggio impostazioni per player:', updatedPlayer);
+
+		// In un'app reale, qui faresti una chiamata API al backend per salvare i dati
+		// Esempio:
+		// fetch('/api/save-player-settings', {
+		//   method: 'POST',
+		//   headers: { 'Content-Type': 'application/json' },
+		//   body: JSON.stringify(updatedPlayer)
+		// });
+	};
+
 	const {
 		classifica: data,
 		classificaLoading,
@@ -90,131 +172,72 @@ function App() {
 	const handleClose = () => {
 		setOpen(false);
 	};
-	const [players, setPlayers] = useState<Player[]>([
-		{
-			id: 1,
-			model: 'models/Loris.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking2',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 2,
-			model: 'models/Francesco.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking7',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 3,
-			model: 'models/Ale.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking8',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 4,
-			model: 'models/Laura.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Injured_Walking',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 5,
-			model: 'models/Achille.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking5',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 6,
-			model: 'models/Cristian.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking3',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 7,
-			model: 'models/Default.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Catwalk_Walk',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 8,
-			model: 'models/Default.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Catwalk_Walk',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 9,
-			model: 'models/Mattia.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Sneak_Walk',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 10,
-			model: 'models/Cristina.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking1',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 11,
-			model: 'models/Enrico.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Walking6',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-		{
-			id: 12,
-			model: 'models/Default.glb',
-			trigger: false,
-			action: 'Walking',
-			defaultAction: 'Catwalk_Walk',
-			sendAction: 'Walking',
-			defaultVictory: 'Victory',
-			defaultDefeat: 'Defeat',
-		},
-	]);
+
+	// Inizializza con un array vuoto e carica i dati dal JSON
+	const [players, setPlayers] = useState<Player[]>([]);
+
+	// Carica i dati dei player dal JSON esterno quando il componente si monta
+	useEffect(() => {
+		// Utilizziamo il percorso relativo corretto per l'ambiente Vite
+		fetch('./models_settings.json')
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error('Errore nel caricamento del file JSON');
+				}
+				return response.json();
+			})
+			.then((data) => {
+				// Trasforma l'oggetto JSON in un array di player
+				// Ogni chiave è il nome del giocatore, quindi lo aggiungiamo all'oggetto
+				const playerArray = Object.entries(data).map(([name, playerData]) => ({
+					...(playerData as Player),
+					name, // Aggiungiamo il nome dal JSON alle proprietà del player
+				}));
+				setPlayers(playerArray);
+			})
+			.catch((error) => {
+				console.error('Errore nel caricamento dei player:', error);
+				// In caso di errore, utilizziamo un set di dati di fallback
+				const fallbackPlayers = [
+					{
+						id: 0,
+						model: 'models/Default.glb',
+						trigger: false,
+						action: 'Walking',
+						defaultAction: 'Catwalk_Walk',
+						sendAction: 'Walking',
+						defaultVictory: 'Victory',
+						defaultDefeat: 'Defeat',
+						name: 'Default Player',
+					},
+				];
+				setPlayers(fallbackPlayers);
+			});
+	}, []);
 
 	// Memoize players to prevent unnecessary rerenders
 	const memoizedPlayers = useMemo(() => players, [players]);
+
+	// Add a safeguard function to prevent passing undefined to DefaultModel
+	const getPlayerOrDefault = useCallback(
+		(id: number) => {
+			const player = memoizedPlayers.find((p) => p.id === id);
+			// Return a default player if none is found to prevent undefined errors
+			return (
+				player || {
+					id: 0,
+					model: 'models/Default.glb',
+					trigger: false,
+					action: 'Walking',
+					defaultAction: 'Catwalk_Walk',
+					sendAction: 'Walking',
+					defaultVictory: 'Victory',
+					defaultDefeat: 'Defeat',
+				}
+			);
+		},
+		[memoizedPlayers]
+	);
 
 	// Render only visible models based on viewport
 	const [visibleRangeStart, _setVisibleRangeStart] = useState(0);
@@ -527,6 +550,43 @@ function App() {
 													{team.name}
 												</Typography>
 
+												{/* qui va il dropdown */}
+												<Tooltip title='Modifica animazione'>
+													<IconButton
+														onClick={(event) =>
+															handleAnimationMenuOpen(event, team.id)
+														}
+														size='small'
+														sx={{ padding: '2px' }}
+													>
+														<EditIcon fontSize='small' />
+													</IconButton>
+												</Tooltip>
+												<Menu
+													anchorEl={animationMenuAnchor}
+													open={Boolean(animationMenuAnchor)}
+													onClose={handleAnimationMenuClose}
+													transitionDuration={0} // Immediate animation
+													PaperProps={{
+														elevation: 0, // Removes box shadow
+														sx: {
+															boxShadow: 'none',
+															border: '1px solid #e0e0e0',
+														},
+													}}
+												>
+													{availableAnimations.map((animation) => (
+														<MenuItem
+															key={animation.value}
+															onClick={() =>
+																changePlayerAnimation(animation.value)
+															}
+														>
+															{animation.name}
+														</MenuItem>
+													))}
+												</Menu>
+
 												<Typography fontWeight={500} fontSize={'12px'}>
 													{team.win_match}/{team.total_match} -{' '}
 													{team.total_match > 0
@@ -610,13 +670,7 @@ function App() {
 											<Environment preset='sunset' />
 
 											<group position-y={-1}>
-												<DefaultModel
-													player={
-														memoizedPlayers.find(
-															(f) => f.id === team.id
-														) as Player
-													}
-												/>
+												<DefaultModel player={getPlayerOrDefault(team.id)} />
 											</group>
 											<mesh
 												position-y={-1}
