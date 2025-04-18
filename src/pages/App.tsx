@@ -22,11 +22,9 @@ import React, {
 	Suspense,
 	useMemo,
 	useCallback,
-	useRef,
 } from 'react';
 import { Environment, Html, OrbitControls, Sky } from '@react-three/drei';
 import EditIcon from '@mui/icons-material/Edit';
-import { savePlayerAnimation } from '../api';
 
 import { TransitionProps } from '@mui/material/transitions';
 import { useDialog } from '../useDialog';
@@ -136,20 +134,6 @@ function App() {
 		}
 
 		handleAnimationMenuClose();
-	};
-
-	// Funzione per salvare le impostazioni nel file JSON
-	const savePlayerSettings = (updatedPlayer: Player) => {
-		// Non possiamo scrivere direttamente nel file, quindi mostriamo solo un log
-		console.log('Salvataggio impostazioni per player:', updatedPlayer);
-
-		// In un'app reale, qui faresti una chiamata API al backend per salvare i dati
-		// Esempio:
-		// fetch('/api/save-player-settings', {
-		//   method: 'POST',
-		//   headers: { 'Content-Type': 'application/json' },
-		//   body: JSON.stringify(updatedPlayer)
-		// });
 	};
 
 	const {

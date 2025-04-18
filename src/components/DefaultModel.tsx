@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useGraph } from '@react-three/fiber';
 import { useAnimations, useFBX, useGLTF } from '@react-three/drei';
 import { GLTF, SkeletonUtils } from 'three-stdlib';
@@ -46,14 +46,7 @@ interface Player {
 export function DefaultModel(
 	props: JSX.IntrinsicElements['group'] & { player: Player }
 ) {
-	const {
-		model,
-		trigger,
-		defaultAction,
-		sendAction,
-		defaultVictory,
-		defaultDefeat,
-	} = props.player;
+	const { model, trigger, defaultAction, sendAction } = props.player;
 
 	// Load the model and handle fallback
 	const { scene } = useGLTF(model);
