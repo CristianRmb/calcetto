@@ -1,4 +1,10 @@
-import { Environment, OrbitControls, Sky } from '@react-three/drei';
+import {
+	Environment,
+	OrbitControls,
+	Sky,
+	Preload,
+	useGLTF,
+} from '@react-three/drei';
 import { Canvas } from '@react-three/fiber';
 import {
 	FormControl,
@@ -6,13 +12,15 @@ import {
 	MenuItem,
 	Select,
 	Stack,
+	CircularProgress,
 } from '@mui/material';
 
-import { useState } from 'react';
+import { Suspense, useState, useEffect, useMemo } from 'react';
 import { DefaultAvatar } from '../components/DefaultAvatar';
 import { useMatches } from '../useMatch';
 
 function ModelsPage() {
+	const [loading, setLoading] = useState(true);
 	const [player, setPlayer] = useState({
 		id: 7,
 		model: 'models/Default.glb',
@@ -26,32 +34,64 @@ function ModelsPage() {
 
 	const match = useMatches();
 
+	// Precaricare il modello default per migliorare il caricamento iniziale
+	useEffect(() => {
+		// Indica il caricamento completato dopo un breve ritardo
+		const timer = setTimeout(() => {
+			setLoading(false);
+		}, 800);
+
+		// Pre-carica il modello default
+		useGLTF.preload('models/Default.glb');
+
+		return () => clearTimeout(timer);
+	}, []);
+
+	const canvasWidth = useMemo(
+		() => (!match.matchSM ? 'calc(100vw - 58px)' : '50vw'),
+		[match.matchSM]
+	);
+
 	return (
 		<Stack direction={{ xs: 'column-reverse', md: 'row' }} gap={2}>
-			<Canvas
-				style={{
-					width: !match.matchSM ? 'calc(100vw - 58px)' : '50vw',
-					height: 'calc(100vh - 64px)',
-				}}
-				shadows
-				camera={{ position: [0, 0.5, 5], fov: 30 }}
-			>
-				<>
-					<Sky sunPosition={[-100, 50, 100]} />
-					<Environment preset='sunset' />
-
-					<OrbitControls />
-					{/* <TransformControls mode='translate' /> */}
-					<group position-y={-1}>
-						<DefaultAvatar player={player} />
-					</group>
-					<mesh position-y={-1} scale={5} rotation-x={-Math.PI * 0.5}>
-						<planeGeometry args={[100, 100]} />
-						<meshStandardMaterial color='white' />
-					</mesh>
-					{/* <ambientLight intensity={2} /> */}
-				</>
-			</Canvas>
+			{loading ? (
+				<div
+					style={{
+						width: canvasWidth,
+						height: 'calc(100vh - 64px)',
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+					}}
+				>
+					<CircularProgress />
+				</div>
+			) : (
+				<Canvas
+					style={{
+						width: canvasWidth,
+						height: 'calc(100vh - 64px)',
+					}}
+					shadows
+					camera={{ position: [0, 0.5, 5], fov: 30 }}
+					// Rimuoviamo frameloop="demand" per consentire animazioni continue
+					dpr={[1, 1.5]} // Limita il Device Pixel Ratio per migliori performance
+				>
+					<Suspense fallback={null}>
+						<Sky sunPosition={[-100, 50, 100]} />
+						<Environment preset='sunset' />
+						<OrbitControls enableDamping={false} makeDefault />
+						<group position-y={-1}>
+							<DefaultAvatar player={player} />
+						</group>
+						<mesh position-y={-1} scale={5} rotation-x={-Math.PI * 0.5}>
+							<planeGeometry args={[100, 100]} />
+							<meshStandardMaterial color='white' />
+						</mesh>
+						<Preload all /> {/* Precarica tutte le texture e i materiali */}
+					</Suspense>
+				</Canvas>
+			)}
 			<Stack sx={{ ml: '20px', mt: '30px', width: '300px' }} gap={2}>
 				<FormControl fullWidth>
 					<InputLabel id='select_animation_id'>Select Animation</InputLabel>
@@ -64,9 +104,9 @@ function ModelsPage() {
 							setPlayer({
 								...player,
 								trigger: !player.trigger,
-								defaultAction: e.target.value,
-								action: e.target.value,
-								sendAction: e.target.value,
+								defaultAction: e.target.value as string,
+								action: e.target.value as string,
+								sendAction: e.target.value as string,
 							});
 						}}
 					>
@@ -88,31 +128,6 @@ function ModelsPage() {
 						<MenuItem value={'Defeat'}>Defeat</MenuItem>
 					</Select>
 				</FormControl>
-				{/* <FormControl fullWidth>
-					<InputLabel id='select_avatar_id'>Select Avatar</InputLabel>
-					<Select
-						labelId='select_avatar_id'
-						id='select_avatar'
-						value={player.model}
-						label='Select Avatar'
-						onChange={(e) => {
-							setPlayer({
-								...player,
-								model: e.target.value,
-							});
-						}}
-					>
-						<MenuItem value={'models/Default.glb'}>Default</MenuItem>
-						<MenuItem value={'models/Loris.glb'}>Loris</MenuItem>
-						<MenuItem value={'models/Francesco.glb'}>Francesco</MenuItem>
-						<MenuItem value={'models/Ale.glb'}>Ale</MenuItem>
-						<MenuItem value={'models/Laura.glb'}>Laura</MenuItem>
-						<MenuItem value={'models/Cristian.glb'}>Cristian</MenuItem>
-						<MenuItem value={'models/Mattia.glb'}>Mattia</MenuItem>
-						<MenuItem value={'models/Cristina.glb'}>Cristina</MenuItem>
-						<MenuItem value={'models/Enrico.glb'}>Enrico</MenuItem>
-					</Select>
-				</FormControl> */}
 			</Stack>
 		</Stack>
 	);

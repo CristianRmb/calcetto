@@ -12,7 +12,13 @@ import {
 	Typography,
 } from '@mui/material';
 import { Canvas } from '@react-three/fiber';
-import React, { useEffect, useState } from 'react';
+import React, {
+	useEffect,
+	useState,
+	Suspense,
+	useMemo,
+	useCallback,
+} from 'react';
 import { Environment, Html, OrbitControls, Sky } from '@react-three/drei';
 
 import { TransitionProps } from '@mui/material/transitions';
@@ -206,6 +212,40 @@ function App() {
 			defaultDefeat: 'Defeat',
 		},
 	]);
+
+	// Memoize players to prevent unnecessary rerenders
+	const memoizedPlayers = useMemo(() => players, [players]);
+
+	// Render only visible models based on viewport
+	const [visibleRangeStart, setVisibleRangeStart] = useState(0);
+	const [visibleRangeEnd, setVisibleRangeEnd] = useState(4); // Initially load only first 4 models
+
+	// Use IntersectionObserver to detect when an element is in viewport
+	const observerCallback = useCallback(
+		(entries: IntersectionObserverEntry[]) => {
+			entries.forEach((entry: IntersectionObserverEntry) => {
+				if (entry.isIntersecting) {
+					const teamId = parseInt(entry.target.id.split('_')[1]);
+					setVisibleRangeEnd((prev) => Math.max(prev, teamId + 3));
+				}
+			});
+		},
+		[]
+	);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(observerCallback, {
+			root: null,
+			rootMargin: '0px',
+			threshold: 0.1,
+		});
+
+		document.querySelectorAll('[id^="team_"]').forEach((element) => {
+			observer.observe(element);
+		});
+
+		return () => observer.disconnect();
+	}, [observerCallback, classifica]);
 
 	useEffect(() => {
 		console.log('DATA: ', data);
@@ -432,150 +472,179 @@ function App() {
 				spacing={2}
 				className='h-full'
 			>
-				{classifica.map((team, index) => (
-					<Stack
-						direction={'row'}
-						justifyContent={'space-between'}
-						alignItems={'center'}
-						id={`team_${team.id}`}
-						key={`team_${team.id}`}
-					>
-						<Canvas
-							style={{
-								width: '250px',
-								height: '400px',
-								position: 'relative',
-								zIndex: 0,
-							}}
-							shadows
-							camera={{ position: [0, 0.5, 5], fov: 30 }}
-							id={`canvas_${team.id}`}
-							key={`canvas_${team.id}`}
+				{classifica.map((team, index) => {
+					const isVisible =
+						index >= visibleRangeStart && index <= visibleRangeEnd;
+					return (
+						<Stack
+							direction={'row'}
+							justifyContent={'space-between'}
+							alignItems={'center'}
+							id={`team_${team.id}`}
+							key={`team_${team.id}`}
 						>
-							<Html
-								style={{
-									position: 'absolute', // Posizione assoluta rispetto al canvas
-									top: -180, // Fissa in alto
-									left: -110, // Fissa a sinistra
-									zIndex: 1, // Porta in primo piano rispetto alla scena 3D
-								}}
-								position={[0, 0, 0]}
-							>
-								<Stack
-									direction={'column'}
-									height={'368px'}
-									width={220}
-									id={`stack_1_${team.id}`}
-									justifyContent={'space-between'}
+							{isVisible ? (
+								<Canvas
+									style={{
+										width: '250px',
+										height: '400px',
+										position: 'relative',
+										zIndex: 0,
+									}}
+									shadows
+									camera={{ position: [0, 0.5, 5], fov: 30 }}
+									id={`canvas_${team.id}`}
+									key={`canvas_${team.id}`}
+									dpr={[1, 1.5]} // Lower DPR for better performance
 								>
-									<Stack
-										direction={'row'}
-										gap={2}
-										alignItems={'center'}
-										justifyContent={'space-between'}
-										id={`stack_2_${team.id}`}
-										key={`stack_2_${team.id}`}
+									<Html
+										style={{
+											position: 'absolute', // Posizione assoluta rispetto al canvas
+											top: -180, // Fissa in alto
+											left: -110, // Fissa a sinistra
+											zIndex: 1, // Porta in primo piano rispetto alla scena 3D
+										}}
+										position={[0, 0, 0]}
 									>
-										<Typography fontSize={'18px'}>{index + 1}</Typography>
-
-										<Typography fontWeight={600} fontSize={'12px'}>
-											{team.name}
-										</Typography>
-
-										<Typography fontWeight={500} fontSize={'12px'}>
-											{team.win_match}/{team.total_match} -{' '}
-											{team.total_match > 0
-												? ((team.win_match / team.total_match) * 100).toFixed(2)
-												: 0}
-											%
-										</Typography>
-									</Stack>
-
-									<Stack
-										direction={'row'}
-										style={{ width: '100%' }}
-										gap={2}
-										alignItems={'center'}
-										justifyContent={'center'}
-										id={`stack_3_${team.id}`}
-										key={`stack_3_${team.id}`}
-									>
-										<Button
-											variant='contained'
-											color='success'
-											sx={{ height: '20px' }}
-											onClick={() => {
-												confirmDialog.handleOpen({
-													name: team.name,
-													id: team.id,
-													action: 'vinto',
-													animation: 'Victory',
-												});
-											}}
+										<Stack
+											direction={'column'}
+											height={'368px'}
+											width={220}
+											id={`stack_1_${team.id}`}
+											justifyContent={'space-between'}
 										>
-											Win
-										</Button>
-										<Button
-											variant='contained'
-											color='error'
-											sx={{ height: '20px' }}
-											onClick={() => {
-												confirmDialog.handleOpen({
-													name: team.name,
-													id: team.id,
-													action: 'perso',
-													animation: 'Defeat',
-												});
-											}}
-										>
-											Lose
-										</Button>
-										<Box
-											onClick={() => {
-												const currentIndex = checked.indexOf(team.id);
-												const newChecked = [...checked];
+											<Stack
+												direction={'row'}
+												gap={2}
+												alignItems={'center'}
+												justifyContent={'space-between'}
+												id={`stack_2_${team.id}`}
+												key={`stack_2_${team.id}`}
+											>
+												<Typography fontSize={'18px'}>{index + 1}</Typography>
 
-												if (currentIndex === -1) {
-													newChecked.push(team.id);
-												} else {
-													newChecked.splice(currentIndex, 1);
-												}
+												<Typography fontWeight={600} fontSize={'12px'}>
+													{team.name}
+												</Typography>
 
-												setChecked(newChecked);
-											}}
-										>
-											<Checkbox
-												edge='start'
-												checked={checked.includes(team.id)}
-												tabIndex={-1}
-												disableRipple
-											/>
-										</Box>
-									</Stack>
-								</Stack>
-							</Html>
-							<color attach='background' args={['#f0f0f0']} />
-							<>
-								<OrbitControls />
-								<Sky sunPosition={[-100, 50, 100]} />
-								<Environment preset='sunset' />
+												<Typography fontWeight={500} fontSize={'12px'}>
+													{team.win_match}/{team.total_match} -{' '}
+													{team.total_match > 0
+														? (
+																(team.win_match / team.total_match) *
+																100
+														  ).toFixed(2)
+														: 0}
+													%
+												</Typography>
+											</Stack>
 
-								<group position-y={-1}>
-									{/* <DefaultAvatar
-										player={players.find((f) => f.id === team.id)}
-									/> */}
-									<DefaultModel
-										player={players.find((f) => f.id === team.id) as Player}
-									/>
-								</group>
-								<mesh position-y={-1} scale={5} rotation-x={-Math.PI * 0.5}>
-									<planeGeometry args={[100, 100]} />
-									<meshStandardMaterial color='white' />
-								</mesh>
-							</>
-						</Canvas>
-					</Stack>
-				))}
+											<Stack
+												direction={'row'}
+												style={{ width: '100%' }}
+												gap={2}
+												alignItems={'center'}
+												justifyContent={'center'}
+												id={`stack_3_${team.id}`}
+												key={`stack_3_${team.id}`}
+											>
+												<Button
+													variant='contained'
+													color='success'
+													sx={{ height: '20px' }}
+													onClick={() => {
+														confirmDialog.handleOpen({
+															name: team.name,
+															id: team.id,
+															action: 'vinto',
+															animation: 'Victory',
+														});
+													}}
+												>
+													Win
+												</Button>
+												<Button
+													variant='contained'
+													color='error'
+													sx={{ height: '20px' }}
+													onClick={() => {
+														confirmDialog.handleOpen({
+															name: team.name,
+															id: team.id,
+															action: 'perso',
+															animation: 'Defeat',
+														});
+													}}
+												>
+													Lose
+												</Button>
+												<Box
+													onClick={() => {
+														const currentIndex = checked.indexOf(team.id);
+														const newChecked = [...checked];
+
+														if (currentIndex === -1) {
+															newChecked.push(team.id);
+														} else {
+															newChecked.splice(currentIndex, 1);
+														}
+
+														setChecked(newChecked);
+													}}
+												>
+													<Checkbox
+														edge='start'
+														checked={checked.includes(team.id)}
+														tabIndex={-1}
+														disableRipple
+													/>
+												</Box>
+											</Stack>
+										</Stack>
+									</Html>
+									<color attach='background' args={['#f0f0f0']} />
+									<Suspense fallback={null}>
+										<>
+											<OrbitControls enableDamping={false} />
+											<Sky sunPosition={[-100, 50, 100]} />
+											<Environment preset='sunset' />
+
+											<group position-y={-1}>
+												<DefaultModel
+													player={
+														memoizedPlayers.find(
+															(f) => f.id === team.id
+														) as Player
+													}
+												/>
+											</group>
+											<mesh
+												position-y={-1}
+												scale={5}
+												rotation-x={-Math.PI * 0.5}
+											>
+												<planeGeometry args={[100, 100]} />
+												<meshStandardMaterial color='white' />
+											</mesh>
+										</>
+									</Suspense>
+								</Canvas>
+							) : (
+								<div
+									style={{
+										width: '250px',
+										height: '400px',
+										display: 'flex',
+										justifyContent: 'center',
+										alignItems: 'center',
+									}}
+								>
+									<Typography>Caricamento modello...</Typography>
+								</div>
+							)}
+						</Stack>
+					);
+				})}
 			</Grid2>
 		</Stack>
 	);

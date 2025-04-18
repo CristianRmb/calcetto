@@ -1,0 +1,122 @@
+{
+	"Loris": {
+		"id": 1,
+		"model": "models/Loris.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking2",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Francesco": {
+		"id": 2,
+		"model": "models/Francesco.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking7",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Ale": {
+		"id": 3,
+		"model": "models/Ale.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking8",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Laura": {
+		"id": 4,
+		"model": "models/Laura.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Injured_Walking",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Achille": {
+		"id": 5,
+		"model": "models/Achille.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking5",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Cristian": {
+		"id": 6,
+		"model": "models/Cristian.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking3",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Player7": {
+		"id": 7,
+		"model": "models/Default.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Catwalk_Walk",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Player8": {
+		"id": 8,
+		"model": "models/Default.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Catwalk_Walk",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Mattia": {
+		"id": 9,
+		"model": "models/Mattia.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Sneak_Walk",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Cristina": {
+		"id": 10,
+		"model": "models/Cristina.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking1",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Enrico": {
+		"id": 11,
+		"model": "models/Enrico.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Walking6",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	},
+	"Player12": {
+		"id": 12,
+		"model": "models/Default.glb",
+		"trigger": false,
+		"action": "Walking",
+		"defaultAction": "Catwalk_Walk",
+		"sendAction": "Walking",
+		"defaultVictory": "Victory",
+		"defaultDefeat": "Defeat"
+	}
+}
