@@ -217,7 +217,7 @@ function App() {
 	const memoizedPlayers = useMemo(() => players, [players]);
 
 	// Render only visible models based on viewport
-	const [visibleRangeStart, setVisibleRangeStart] = useState(0);
+	const [visibleRangeStart, _setVisibleRangeStart] = useState(0);
 	const [visibleRangeEnd, setVisibleRangeEnd] = useState(4); // Initially load only first 4 models
 
 	// Use IntersectionObserver to detect when an element is in viewport
